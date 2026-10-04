@@ -13,6 +13,7 @@ export const nextMove = defineType({
     defineField({name: 'wildcard', title: 'Wildcard', type: 'text'}),
     defineField({
       name: 'fromProjection',
+      weak: true,
       title: 'From Projection',
       type: 'reference',
       to: [{type: 'projection'}],

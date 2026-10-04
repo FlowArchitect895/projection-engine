@@ -1,0 +1,625 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "name": "summary",
+        "type": "text"
+      },
+      {
+        "description": "The stages of the loop, in order",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "stage"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to stage"
+          }
+        ],
+        "name": "stages",
+        "type": "array"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "name": "version",
+        "type": "string"
+      }
+    ],
+    "name": "method",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "order",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "prompt",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "outputField",
+        "type": "string"
+      },
+      {
+        "description": "The mechanics that govern this stage",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "mechanic"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to mechanic"
+          }
+        ],
+        "name": "mechanics",
+        "type": "array"
+      }
+    ],
+    "name": "stage",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "body",
+        "type": "text"
+      },
+      {
+        "name": "sourceRef",
+        "type": "string",
+        "title": "Source Reference"
+      },
+      {
+        "description": "The ego Source this mechanic speaks through",
+        "to": [
+          {
+            "type": "source"
+          }
+        ],
+        "name": "voicedBy",
+        "type": "reference"
+      }
+    ],
+    "name": "mechanic",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            "ego",
+            "evidence"
+          ]
+        },
+        "initialValue": "evidence",
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "ego",
+                  "evidence"
+                ]
+              }
+            ]
+          }
+        ],
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "name": "originDoc",
+        "type": "string",
+        "title": "Origin Document"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "name": "url",
+        "type": "url",
+        "title": "URL"
+      },
+      {
+        "name": "nativeQuestion",
+        "type": "string"
+      },
+      {
+        "description": "How this ego sounds: rhythm, imagery, humor, in corpus language",
+        "name": "voice",
+        "type": "text"
+      },
+      {
+        "description": "The living backstory this ego comes from",
+        "name": "lore",
+        "type": "text"
+      },
+      {
+        "name": "strength",
+        "type": "text"
+      },
+      {
+        "description": "How this ego goes wrong. The cue for another ego to step in",
+        "name": "shadow",
+        "type": "text"
+      },
+      {
+        "description": "What this ego refuses to do or become",
+        "name": "never",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "to": [
+              {
+                "type": "stage"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to stage"
+          }
+        ],
+        "name": "speaksAt",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "to": [
+              {
+                "type": "source"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to source"
+          }
+        ],
+        "name": "correctedBy",
+        "type": "array"
+      }
+    ],
+    "name": "source",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "description": "One side of the contradiction",
+        "to": [
+          {
+            "type": "mechanic"
+          },
+          {
+            "type": "stage"
+          }
+        ],
+        "name": "sideA",
+        "type": "reference"
+      },
+      {
+        "description": "The other side",
+        "to": [
+          {
+            "type": "mechanic"
+          },
+          {
+            "type": "stage"
+          }
+        ],
+        "name": "sideB",
+        "type": "reference"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "description": "Filled by the human when they rule on it",
+        "name": "resolution",
+        "type": "text"
+      },
+      {
+        "name": "resolvedBy",
+        "type": "string"
+      }
+    ],
+    "name": "tension",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "stage",
+                "type": "string"
+              },
+              {
+                "name": "output",
+                "type": "text"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "fields",
+        "type": "array"
+      },
+      {
+        "description": "Where the egos disagree. Left for the human to resolve",
+        "name": "tension",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            "draft",
+            "reviewed",
+            "archived"
+          ]
+        },
+        "initialValue": "draft",
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "draft",
+                  "reviewed",
+                  "archived"
+                ]
+              }
+            ]
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "projection",
+    "type": "document"
+  },
+  {
+    "description": "A real, buildable next step proposed from a projection. Proposes, waits for the human to own it.",
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            "learn",
+            "build",
+            "ship",
+            "test"
+          ]
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "learn",
+                  "build",
+                  "ship",
+                  "test"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "move",
+        "type": "text",
+        "title": "The Move"
+      },
+      {
+        "name": "firstStep",
+        "type": "text"
+      },
+      {
+        "name": "wildcard",
+        "type": "text"
+      },
+      {
+        "weak": true,
+        "description": "The projection this move came out of",
+        "to": [
+          {
+            "type": "projection"
+          }
+        ],
+        "name": "fromProjection",
+        "type": "reference"
+      },
+      {
+        "description": "The stages or tensions this move traces back to (keeps it honest)",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "stage"
+              },
+              {
+                "type": "tension"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to stage or tension"
+          }
+        ],
+        "name": "groundedIn",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            "proposed",
+            "owned",
+            "dismissed"
+          ]
+        },
+        "initialValue": "proposed",
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "proposed",
+                  "owned",
+                  "dismissed"
+                ]
+              }
+            ]
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "nextMove",
+    "type": "document"
+  }
+]
