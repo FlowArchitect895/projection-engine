@@ -14,11 +14,74 @@ const KINDS = ['learn', 'build', 'ship', 'test']
 const key = () => Math.random().toString(36).slice(2, 10)
 const str = (v, max = 2000) => (typeof v === 'string' ? v.slice(0, max) : '')
 
+const W = Math.min(process.stdout.columns || 80, 86)
+const useColor = process.stdout.isTTY && !process.env.NO_COLOR
+
+// true-color palette, same hex as the web atmosphere
+const HEX = {
+  ink:      [240, 244, 248],
+  dim:      [138, 155, 176],
+  faint:    [74, 82, 94],
+  analyst:  [79, 216, 196],
+  builder:  [232, 163, 61],
+  connector:[155, 127, 255],
+}
+const fg = (rgb, s) => (useColor ? `\x1b[38;2;${rgb[0]};${rgb[1]};${rgb[2]}m${s}\x1b[0m` : s)
+const bold = (s) => (useColor ? `\x1b[1m${s}\x1b[0m` : s)
+const italic = (s) => (useColor ? `\x1b[3m${s}\x1b[0m` : s)
+const ink = (s) => fg(HEX.ink, s)
+const dim = (s) => fg(HEX.dim, s)
+const faint = (s) => fg(HEX.faint, s)
+const egoRGB = (name = '') => {
+  const n = String(name).toLowerCase()
+  if (n.includes('analyst')) return HEX.analyst
+  if (n.includes('builder')) return HEX.builder
+  if (n.includes('connector')) return HEX.connector
+  return HEX.ink
+}
+const lerp = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t))
+
+// a soft seam between two ego colors — the terminal version of the web page's color-meeting line
+function seam(fromRGB, toRGB, width = W) {
+  if (!useColor) return faint('·'.repeat(Math.min(width, 40)))
+  let out = ''
+  for (let i = 0; i < width; i++) {
+    const t = i / (width - 1)
+    const rgb = lerp(fromRGB, toRGB, t)
+    out += `\x1b[38;2;${rgb[0]};${rgb[1]};${rgb[2]}m─`
+  }
+  return out + '\x1b[0m'
+}
+
+function wrap(text, width, indent = 0) {
+  const pad = ' '.repeat(indent)
+  return String(text ?? '')
+    .split('\n')
+    .map((par) => {
+      const words = par.trim().split(/\s+/).filter(Boolean)
+      if (!words.length) return ''
+      const lines = []
+      let line = ''
+      for (const w of words) {
+        if ((line + ' ' + w).trim().length > width - indent) {
+          lines.push(line)
+          line = w
+        } else {
+          line = (line + ' ' + w).trim()
+        }
+      }
+      lines.push(line)
+      return lines.map((l) => pad + l).join('\n')
+    })
+    .join('\n')
+}
+
 const sanity = createClient({
   projectId: process.env.SANITY_PROJECT_ID,
   dataset: process.env.SANITY_DATASET,
   token: process.env.SANITY_WRITE_TOKEN,
   apiVersion: '2025-01-01',
+  useCdn: false,
   useCdn: false,
 })
 
@@ -61,8 +124,11 @@ Find a real disagreement between egos that came up in THIS run, about THIS domai
 Mark what is a shared mechanism versus only an analogy, inside the tension text. Do not invent connections.
 
 Return ONLY valid JSON, no markdown fences, in this shape:
-{"stages":[{"stage":"Stage Title","ego":"Ego Title","plain":"text","output":"text"}],"tension":"text","nextMove":{"title":"","kind":"learn|build|ship|test","move":"","firstStep":"","wildcard":""}}
-The nextMove is a proposal for the human to own, not a directive.`,
+{"stages":[{"stage":"Stage Title","ego":"Ego Title","plain":"text","output":"text"}],"tension":"text","nextMove":{"title":"","kind":"learn|build|ship|test","move":"","firstStep":"","wildcard":""},"systemBuild":{"title":"","purpose":"","trigger":"","inputs":"","process":[],"outputs":"","failureModes":"","firstImplementation":"","prompt":""}}
+The nextMove is a proposal for the human to own, not a directive.
+
+Generate systemBuild as a required top-level field derived from the original domain, the six-stage projection, the tension, and the nextMove. Describe a reusable system for handling a recurring problem, not a one-time solution to this domain. Fill title, purpose, trigger, inputs, outputs, failureModes, and firstImplementation with specific, actionable content. process must be an ordered array of repeatable steps.
+systemBuild.prompt must be a complete, self-contained copy/paste prompt for another AI to build this reusable system. Include the AI's role and instructions, the system's purpose, trigger, required inputs, repeatable process, expected outputs, and failure modes/guardrails. Explicitly instruct that the system must be reusable rather than solving only the current domain, and ask the AI to produce the first working implementation. Derive this system and prompt from this projection; do not hardcode a system for this particular domain or depend on unspecified prior context.`,
   })
 
   const called = new Set()
@@ -113,11 +179,90 @@ The nextMove is a proposal for the human to own, not a directive.`,
     fromProjection: { _type: 'reference', _ref: id, _weak: true },
   })
 
-  console.log(`\nSaved drafts for "${DOMAIN}". Open Studio to review.`)
-  console.log(`Model used: ${process.env.MODEL || 'gemini-3.5-flash-lite'}`)
-  console.log(`Tools called: ${[...called].join(', ') || '(none)'}`)
-  console.log(`Tension: ${str(d.tension, 300) || '(none surfaced)'}`)
-  console.log(`Next move proposed: ${str(nm.title, 200)}`)
+  // ---- atmosphere-matched terminal output ----
+  const BW = Math.min(W, 78)
+
+  console.log('')
+  console.log(faint('· · ·'))
+  console.log(dim('projection') + faint('  /  ') + dim('six stages, read-only'))
+  console.log('')
+  console.log(bold(italic(ink(wrap(DOMAIN, BW)))))
+  console.log(faint(`saved as ${id} — draft, not yet published`))
+  console.log('')
+
+  d.stages.forEach((s, i, arr) => {
+    const rgb = egoRGB(s.ego)
+    const num = String(i + 1).padStart(2, '0')
+    console.log('')
+    console.log(fg(rgb, num) + '  ' + bold(ink(s.stage)) + '   ' + fg(rgb, String(s.ego || '').toUpperCase()))
+    console.log(faint('─'.repeat(Math.min(BW, 28))))
+    console.log('')
+    console.log(dim(wrap(s.plain, BW - 4, 4)))
+    console.log('')
+    console.log(wrap(s.output, BW - 4, 4))
+    if (i < arr.length - 1) {
+      const nextRGB = egoRGB(arr[i + 1].ego)
+      console.log('')
+      console.log(seam(rgb, nextRGB, BW))
+    }
+  })
+
+  console.log('')
+  console.log('')
+  console.log(seam(HEX.builder, HEX.connector, BW))
+  console.log('')
+  console.log(faint('tension') + '  ' + dim('— unresolved by design'))
+  console.log('')
+  console.log(wrap(d.tension || 'None surfaced.', BW))
+  console.log('')
+  console.log(seam(HEX.connector, HEX.builder, BW))
+
+  console.log('')
+  console.log('')
+  console.log(faint('next move') + '  ' + dim('— proposed, yours to own'))
+  console.log('')
+  console.log(bold(ink(nm.title || '')) + '  ' + faint(`[${nm.kind || ''}]`))
+  console.log('')
+  console.log(wrap(nm.move, BW))
+  console.log('')
+  console.log(dim('first step') + '  ' + wrap(nm.firstStep, BW - 12, 0))
+  console.log(dim('wildcard  ') + '  ' + wrap(nm.wildcard, BW - 12, 0))
+
+  const systemBuild = d.systemBuild
+  const renderSystemBuildField = (label, value) => {
+    console.log('')
+    console.log(faint(`  ${label}`))
+    if (Array.isArray(value)) {
+      value.forEach((item) => console.log(dim(wrap(`• ${item}`, BW, 2))))
+    } else {
+      console.log(dim(wrap(value, BW, 2)))
+    }
+  }
+
+  console.log('')
+  console.log('')
+  console.log(bold(ink('SYSTEM BUILD')) + faint('  /  ') + dim('reusable system'))
+  renderSystemBuildField('TITLE', systemBuild.title)
+  renderSystemBuildField('PURPOSE', systemBuild.purpose)
+  renderSystemBuildField('TRIGGER', systemBuild.trigger)
+  renderSystemBuildField('INPUTS', systemBuild.inputs)
+  console.log('')
+  console.log(faint('  PROCESS'))
+  systemBuild.process.forEach((step, i) => {
+    console.log(dim(wrap(`${i + 1}. ${step}`, BW, 2)))
+  })
+  renderSystemBuildField('OUTPUTS', systemBuild.outputs)
+  renderSystemBuildField('FAILURE MODES', systemBuild.failureModes)
+  renderSystemBuildField('FIRST IMPLEMENTATION', systemBuild.firstImplementation)
+  console.log('')
+  console.log(bold(ink('  PROMPT READY — COPY BELOW')))
+  console.log('')
+  console.log(dim(wrap(systemBuild.prompt, BW, 2)))
+
+  console.log('')
+  console.log(faint('· · ·'))
+  console.log(faint(`model ${process.env.MODEL || 'gemini-3.5-flash-lite'}  ·  tools called ${[...called].join(', ') || 'none'}  ·  full-${id}.json`))
+  console.log('')
 } finally {
   await mcp.close()
 }
