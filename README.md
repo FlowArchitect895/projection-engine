@@ -1,9 +1,15 @@
-# Sanity Clean Content Studio
+# Projection Engine — Content Studio
 
-Congratulations, you have now installed the Sanity Content Studio, an open-source real-time content editing environment connected to the Sanity backend.
+The content layer behind the Projection Engine.
 
-Now you can do the following things:
+This Studio manages the structured reasoning data used by the system, including stages, mechanics, methods, analytical lenses, tensions, next moves, and sources.
 
-- [Read “getting started” in the docs](https://www.sanity.io/docs/introduction/getting-started?utm_source=readme)
-- [Join the Sanity community](https://www.sanity.io/community/join?utm_source=readme)
-- [Extend and build plugins](https://www.sanity.io/docs/content-studio/extending?utm_source=readme)
+The Projection Engine reads this structured content as context when processing questions and generating reusable systems.
+
+Built with **Sanity Content Studio**, an open-source real-time content editing environment connected to the Sanity backend.
+
+## Learn More
+
+* [Sanity Getting Started](https://www.sanity.io/docs/introduction/getting-started)
+* [Sanity Community](https://www.sanity.io/community/join)
+* [Sanity Studio Plugins](https://www.sanity.io/docs/content-studio/extending)
