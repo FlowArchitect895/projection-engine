@@ -138,7 +138,7 @@ systemBuild.prompt must be a complete, self-contained copy/paste prompt for anot
 
   let d
   try {
-    d = JSON.parse(result.text.replace(/```json|```/g, '').trim())
+    d = JSON.parse(result.text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)[0])
   } catch {
     console.error('Model did not return valid JSON. Nothing written. Raw output:\n', result.text)
     process.exit(1)
